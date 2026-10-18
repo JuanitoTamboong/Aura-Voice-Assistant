@@ -1,0 +1,99 @@
+/* Base Styles */
+body {
+    background-color: #05060f;
+    color: #ffffff;
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism & Custom Cards */
+.glass-card {
+    background: linear-gradient(135deg, rgba(17, 19, 40, 0.85), rgba(11, 13, 28, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(12px);
+}
+
+.glass-card-hover:hover {
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #090a16;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1c1f3d;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00f0ff;
+}
+
+/* Pulsing Outer Visualizer Ring Animation */
+@keyframes orbGlow {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.3), inset 0 0 20px rgba(0, 240, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(168, 85, 247, 0.5), inset 0 0 40px rgba(236, 72, 153, 0.3);
+    }
+}
+
+.orb-glow {
+    animation: orbGlow 4s infinite ease-in-out;
+}
+
+.listening-active {
+    animation: orbGlow 1s infinite ease-in-out !important;
+    border-color: #00f0ff !important;
+}
+
+/* Map 3D Grid Overlay Simulation */
+.map-grid {
+    background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* =========================================
+   FIX FOR THE FLOATING POP-OUT WINDOW
+   ========================================= */
+@media (max-width: 500px) {
+    /* Hide the bottom navigation dock in the pop-out */
+    nav.absolute.bottom-2 {
+        display: none !important;
+    }
+    
+    /* Shrink the glowing orb so it fits the smaller window */
+    #orbContainer {
+        width: 220px !important;
+        height: 220px !important;
+        margin-top: 10px;
+    }
+
+    /* Adjust text sizes */
+    #statusText {
+        font-size: 1.25rem !important;
+        margin-top: 5px;
+    }
+    
+    #transcriptText {
+        font-size: 0.95rem !important;
+    }
+
+    /* Push the mic button up and make it bigger and easier to click */
+    #micBtn {
+        margin-top: 10px !important;
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+        margin-bottom: 15px;
+    }
+}

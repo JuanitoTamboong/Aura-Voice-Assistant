@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura - Futuristic Voice Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#05060f', cardBg: '#111328', cardBorder: '#1c1f3d',
+                        neonCyan: '#00f0ff', neonPurple: '#a855f7', neonPink: '#ec4899', textMuted: '#6b7280'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'], rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="h-screen flex flex-col justify-between p-4 md:p-6 overflow-hidden select-none">
+
+    <!-- TOP HEADER -->
+    <header class="flex items-center justify-between px-6 py-3 glass-card rounded-2xl mb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h1 class="font-orbitron font-bold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                Aura AI
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <!-- User Profile -->
+            <div class="flex items-center gap-3 bg-slate-900/60 px-3 py-1.5 rounded-full border border-slate-800">
+                <img src="https://ui-avatars.com/api/?name=Juanito+Tamboong&background=00f0ff&color=fff" alt="Avatar" class="w-7 h-7 rounded-full object-cover ring-2 ring-cyan-500/50">
+                <span class="text-sm font-semibold text-slate-200 tracking-wide">Juanito Tamboong</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-4 text-slate-400">
+                <button class="hover:text-cyan-400 transition-colors relative" title="Notifications">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full"></span>
+                </button>
+                <button class="hover:text-cyan-400 transition-colors" title="Night Mode">
+                    <i class="fa-regular fa-moon text-lg"></i>
+                </button>
+
+                <!-- NEW: Pop-out Button -->
+                <button id="pipBtn" class="hover:text-cyan-400 transition-colors" title="Pop out Aura">
+                    <i class="fa-solid fa-up-right-from-square text-lg"></i>
+                </button>
+
+                <div class="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg text-amber-400 text-xs font-bold tracking-widest uppercase">
+                    <i class="fa-solid fa-star text-amber-400"></i> Premium
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT GRID -->
+    <main class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
+
+        <!-- LEFT PANEL -->
+        <section class="col-span-3 glass-card rounded-2xl p-5 flex flex-col justify-between overflow-hidden">
+            <div>
+                <h2 class="font-orbitron font-semibold text-slate-300 text-sm tracking-wider uppercase mb-4 flex items-center justify-between">
+                    <span>Previous Search History</span>
+                    <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400"></i>
+                </h2>
+                <div class="grid grid-cols-2 gap-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-1" id="historyContainer"></div>
+            </div>
+            <div class="flex justify-center pt-2">
+                <button id="scrollHistoryBtn" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-400 flex items-center justify-center transition-all border border-slate-700">
+                    <i class="fa-solid fa-arrow-down text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- CENTER PANEL -->
+        <section class="col-span-6 flex flex-col items-center justify-center relative px-4">
+            <div class="relative flex flex-col items-center justify-center">
+                <div id="orbContainer" class="w-80 h-80 rounded-full glass-card border border-cyan-500/30 orb-glow flex items-center justify-center relative overflow-hidden transition-all duration-500">
+                    <canvas id="waveCanvas" class="w-full h-full absolute inset-0"></canvas>
+                </div>
+                <div class="mt-8 text-center min-h-[3rem] px-6">
+                    <p id="transcriptText" class="text-slate-400 font-medium text-lg italic tracking-wide transition-opacity">
+                        "What's the price of hoverboard..."
+                    </p>
+                    <p id="statusText" class="font-orbitron text-2xl font-bold tracking-widest text-slate-100 mt-2 uppercase">
+                        Aura Ready
+                    </p>
+                </div>
+                <button id="micBtn" class="mt-5 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-purple-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all">
+                    <i id="micIcon" class="fa-solid fa-microphone text-xl"></i>
+                </button>
+            </div>
+
+            <nav class="absolute bottom-2 flex items-center gap-6 bg-slate-900/90 border border-slate-800 backdrop-blur-xl px-8 py-3 rounded-2xl shadow-2xl">
+                <button class="text-cyan-400 hover:scale-110 transition-transform"><i class="fa-solid fa-house text-lg"></i></button>
+                <button class="text-slate-500 hover:text-cyan-400 hover:scale-110 transition-all"><i class="fa-solid fa-magnifying-glass text-lg"></i></button>
+                <button class="text-slate-500 hover:text-cyan-400 hover:scale-110 transition-all"><i class="fa-solid fa-layer-group text-lg"></i></button>
+                <button class="text-slate-500 hover:text-cyan-400 hover:scale-110 transition-all"><i class="fa-solid fa-folder text-lg"></i></button>
+            </nav>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="col-span-3 glass-card rounded-2xl p-5 flex flex-col justify-between overflow-y-auto">
+            <div>
+                <h2 class="font-orbitron font-semibold text-slate-300 text-sm tracking-wider uppercase mb-4 flex items-center justify-between">
+                    <span>Searched By Command</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                </h2>
+                <div class="space-y-3 mb-6">
+                    <div>
+                        <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Title</span>
+                        <p id="commandTitle" class="text-base font-semibold text-slate-200">Hover Board</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Category</span>
+                        <p id="commandCategory" class="text-sm text-cyan-400 font-medium">Personal Transporter</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Search Results</span>
+                            <span id="matchPercentage" class="text-sm font-bold font-orbitron text-cyan-400">92.8%</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 pt-1 border-t border-slate-800">
+                            <button class="hover:text-cyan-400 transition-colors">View All</button>
+                            <button class="hover:text-cyan-400 transition-colors">View Top Results</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <span class="text-xs text-textMuted uppercase font-bold tracking-wider block mb-3">Videos</span>
+                    <div class="space-y-3" id="videoResultsList"></div>
+                </div>
+                <div>
+                    <span class="text-xs text-textMuted uppercase font-bold tracking-wider block mb-2">Nearest Stores</span>
+                    <div class="h-28 rounded-xl relative overflow-hidden border border-slate-800 bg-slate-950 map-grid flex items-center justify-center group cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80"></div>
+                        <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=400&q=80" alt="Map Preview" class="w-full h-full object-cover mix-blend-overlay opacity-60 group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs">
+                            <span class="text-slate-200 font-medium"><i class="fa-solid fa-location-dot text-cyan-400 mr-1"></i> Tech Hub Retail</span>
+                            <span class="text-cyan-400 font-bold">1.2 km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Load the compiled JavaScript -->
+    <script src="./js/app.js"></script>
+</body>
+</html>
