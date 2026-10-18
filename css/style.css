@@ -96,4 +96,10 @@ body {
         height: 3.5rem !important;
         margin-bottom: 15px;
     }
+
+    /* NEW: Scale down the center logo for the small pop-out window */
+    #orbContainer img {
+        width: 5rem !important;
+        height: 5rem !important;
+    }
 }

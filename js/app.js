@@ -151,31 +151,33 @@ function auraSpeak(text) {
 function processCommand(cmd) {
     statusText.innerText = `${ASSISTANT_NAME} Processing...`;
 
-    // FIXED: Close Command
-    if (cmd.includes('close') && (cmd.includes('youtube') || cmd.includes('window'))) {
+    // 1. CLOSE AURA / FLOATING WINDOW ONLY
+    if (cmd.includes('close aura') || cmd.includes('close window') || cmd.includes('close the window')) {
+        auraSpeak("Closing the floating window.");
+        updateDashboardDetails("Closed Window", "System", "100%", []);
         
-        // 1. Try to close the YouTube tab
+        if ('documentPictureInPicture' in window && documentPictureInPicture.window) {
+            documentPictureInPicture.window.close();
+        }
+        return;
+    }
+
+    // 2. CLOSE YOUTUBE ONLY
+    if (cmd.includes('close') && cmd.includes('youtube')) {
         if (youtubeTab && !youtubeTab.closed) {
             youtubeTab.close();
             youtubeTab = null;
             auraSpeak("Closing YouTube.");
             updateDashboardDetails("Closed YouTube", "System", "100%", []);
-        } 
-        // 2. If no tab exists, or it failed to close, close the PiP window!
-        else if ('documentPictureInPicture' in window && documentPictureInPicture.window) {
-            auraSpeak("Closing the floating window.");
-            documentPictureInPicture.window.close();
-            updateDashboardDetails("Closed Window", "System", "100%", []);
-        } 
-        // 3. Fallback
-        else {
-            auraSpeak("I cannot close this tab for security reasons.");
+        } else {
+            // If the tab doesn't exist, or Chrome blocked it:
+            auraSpeak("I cannot close YouTube because the browser blocked it or I didn't open it.");
             updateDashboardDetails("Action Blocked", "Browser Security", "0%", []);
         }
         return;
     }
 
-    // Open YouTube
+    // 3. OPEN YOUTUBE
     if (cmd.includes('open youtube') || (cmd.includes('youtube') && !cmd.includes('close'))) {
         updateDashboardDetails("YouTube", "Video Streaming", "99.9%", [
             { title: "YouTube Home", query: "youtube", img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=120&q=80" }

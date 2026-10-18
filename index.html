@@ -36,9 +36,8 @@
     <!-- TOP HEADER -->
     <header class="flex items-center justify-between px-6 py-3 glass-card rounded-2xl mb-4">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/30">
-                <i class="fa-solid fa-brain"></i>
-            </div>
+            <!-- NEW LOGO ADDED HERE -->
+            <img src="./assets/Aura-Logo.png" alt="Aura Logo" class="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]">
             <h1 class="font-orbitron font-bold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
                 Aura AI
             </h1>
@@ -62,7 +61,7 @@
                     <i class="fa-regular fa-moon text-lg"></i>
                 </button>
 
-                <!-- NEW: Pop-out Button -->
+                <!-- Pop-out Button -->
                 <button id="pipBtn" class="hover:text-cyan-400 transition-colors" title="Pop out Aura">
                     <i class="fa-solid fa-up-right-from-square text-lg"></i>
                 </button>
@@ -96,9 +95,16 @@
         <!-- CENTER PANEL -->
         <section class="col-span-6 flex flex-col items-center justify-center relative px-4">
             <div class="relative flex flex-col items-center justify-center">
+                
+                <!-- THE ORB CONTAINER -->
                 <div id="orbContainer" class="w-80 h-80 rounded-full glass-card border border-cyan-500/30 orb-glow flex items-center justify-center relative overflow-hidden transition-all duration-500">
-                    <canvas id="waveCanvas" class="w-full h-full absolute inset-0"></canvas>
+                    <!-- LOGO ADDED TO CENTER OF ORB -->
+                    <img src="./assets/Aura-Logo.png" alt="Core" class="absolute w-32 h-32 object-contain opacity-80 z-0 pointer-events-none drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]">
+                    
+                    <!-- CANVAS GOES ON TOP -->
+                    <canvas id="waveCanvas" class="w-full h-full absolute inset-0 z-10 pointer-events-none"></canvas>
                 </div>
+
                 <div class="mt-8 text-center min-h-[3rem] px-6">
                     <p id="transcriptText" class="text-slate-400 font-medium text-lg italic tracking-wide transition-opacity">
                         "What's the price of hoverboard..."
