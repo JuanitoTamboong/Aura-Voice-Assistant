@@ -2,7 +2,10 @@
 const ASSISTANT_NAME = "Aura";
 let isListening = false;
 let wavePhase = 0;
-let youtubeTab = null; // Keep track of the YouTube tab
+let youtubeTab = null;
+
+// NEW: Hold data from the database
+let auraDatabase = {};
 
 const historyData = [
     { name: "WEATHER", val: 62 }, { name: "MEDICAL EQUIPMENT", val: 48 },
@@ -25,6 +28,17 @@ const commandCategory = document.getElementById('commandCategory');
 const matchPercentage = document.getElementById('matchPercentage');
 const videoResultsList = document.getElementById('videoResultsList');
 const pipBtn = document.getElementById('pipBtn');
+
+// NEW: Fetch the database on startup
+async function loadDatabase() {
+    try {
+        const response = await fetch('./database/aura.json');
+        auraDatabase = await response.json();
+        console.log("Database loaded successfully:", auraDatabase);
+    } catch (error) {
+        console.error("Failed to load database:", error);
+    }
+}
 
 function renderHistoryCards() {
     if (!historyContainer) return;
@@ -151,7 +165,21 @@ function auraSpeak(text) {
 function processCommand(cmd) {
     statusText.innerText = `${ASSISTANT_NAME} Processing...`;
 
-    // 1. CLOSE AURA / FLOATING WINDOW ONLY
+    // --- NEW: AURA PERSONALITY VIA DATABASE ---
+    if (cmd.includes('who are you') || cmd.includes('your name') || cmd.includes('what are you') || cmd.includes('tell me about yourself')) {
+        // Pull the response from the JSON database
+        const responseText = auraDatabase.greeting || "I am Aura, your virtual assistant. My database is currently offline.";
+        const creatorName = auraDatabase.creator || "Unknown";
+        
+        updateDashboardDetails("Aura AI", "Virtual Assistant", "100%", [
+            { title: "Aura Introduction", query: "Aura AI Assistant", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" }
+        ]);
+        
+        auraSpeak(`${responseText} I was created by ${creatorName}.`);
+        return;
+    }
+
+    // --- CLOSE AURA / FLOATING WINDOW ONLY ---
     if (cmd.includes('close aura') || cmd.includes('close window') || cmd.includes('close the window')) {
         auraSpeak("Closing the floating window.");
         updateDashboardDetails("Closed Window", "System", "100%", []);
@@ -162,7 +190,7 @@ function processCommand(cmd) {
         return;
     }
 
-    // 2. CLOSE YOUTUBE ONLY
+    // --- CLOSE YOUTUBE ONLY ---
     if (cmd.includes('close') && cmd.includes('youtube')) {
         if (youtubeTab && !youtubeTab.closed) {
             youtubeTab.close();
@@ -170,14 +198,13 @@ function processCommand(cmd) {
             auraSpeak("Closing YouTube.");
             updateDashboardDetails("Closed YouTube", "System", "100%", []);
         } else {
-            // If the tab doesn't exist, or Chrome blocked it:
             auraSpeak("I cannot close YouTube because the browser blocked it or I didn't open it.");
             updateDashboardDetails("Action Blocked", "Browser Security", "0%", []);
         }
         return;
     }
 
-    // 3. OPEN YOUTUBE
+    // --- OPEN YOUTUBE ---
     if (cmd.includes('open youtube') || (cmd.includes('youtube') && !cmd.includes('close'))) {
         updateDashboardDetails("YouTube", "Video Streaming", "99.9%", [
             { title: "YouTube Home", query: "youtube", img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=120&q=80" }
@@ -187,6 +214,7 @@ function processCommand(cmd) {
         return;
     }
 
+    // --- GOOGLE SEARCH ---
     if (cmd.startsWith('search for ') || cmd.startsWith('look up ')) {
         const query = cmd.replace('search for ', '').replace('look up ', '');
         updateDashboardDetails(`Search: ${query}`, "Web Search", "95.0%", []);
@@ -195,27 +223,36 @@ function processCommand(cmd) {
         return;
     }
 
+    // --- HOVERBOARD ---
     if (cmd.includes('hoverboard') || cmd.includes('hover board') || cmd.includes('price')) {
         updateDashboardDetails("Hover Board", "Personal Transporter", "92.8%", [
             { title: "Hover Board Review", query: "hoverboard review", img: "https://images.unsplash.com/photo-1520045892732-304bc3ac5d8e?auto=format&fit=crop&w=120&q=80" },
             { title: "Hover Board Unboxing", query: "hoverboard unboxing", img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=120&q=80" }
         ]);
         auraSpeak("Aura is displaying pricing and video reviews for hoverboards.");
-    } else if (cmd.includes('weather')) {
+    } 
+    // --- WEATHER ---
+    else if (cmd.includes('weather')) {
         updateDashboardDetails("Current Weather", "Meteorology & Climate", "98.1%", [
             { title: "Local Weather Forecast", query: "weather forecast", img: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=120&q=80" }
         ]);
         auraSpeak("Aura retrieved the local weather forecast for you.");
-    } else if (cmd.includes('restaurant') || cmd.includes('food')) {
+    } 
+    // --- RESTAURANTS ---
+    else if (cmd.includes('restaurant') || cmd.includes('food')) {
         updateDashboardDetails("Top Restaurants", "Dining & Food", "89.4%", [
             { title: "Best Dining Spots Nearby", query: "restaurants near me", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=120&q=80" }
         ]);
         auraSpeak("Aura found top-rated dining spots nearby.");
-    } else {
+    } 
+    // --- FALLBACK (General Search) ---
+    else {
+        // Use database fallback message if it exists
+        const fallback = auraDatabase.fallback_message || `Aura processing query for ${cmd}`;
         updateDashboardDetails(cmd.toUpperCase(), "General Search", "85.0%", [
             { title: `Search for ${cmd}`, query: cmd, img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" }
         ]);
-        auraSpeak(`Aura processing query for ${cmd}`);
+        auraSpeak(fallback);
     }
 }
 
@@ -292,7 +329,6 @@ if (pipBtn) {
             pipWindow.document.body.style.margin = "0";
             pipWindow.document.body.style.overflow = "hidden";
 
-            // Redraw canvas inside the new window
             setTimeout(() => {
                 const newCanvas = document.getElementById('waveCanvas');
                 if (newCanvas) {
@@ -318,6 +354,9 @@ if (pipBtn) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    // NEW: Load the database when the page starts
+    loadDatabase();
+
     renderHistoryCards();
     resizeCanvas();
     drawParticleWave();
